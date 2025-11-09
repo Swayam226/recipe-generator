@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import GenRecipe from "./GenRecipe";
 import IngredientList from "./IngredientList";
 // import { getRecipeFromGemini } from "../api/gemini";
@@ -7,6 +7,8 @@ import { getRecipeFromGemini } from "../utils/getRecipe";
 export default function Hero() {
   const [ingredients, setIngredients] = useState([]);
   // const [recipeShown, togglerecipeShown] = useState(false);
+  const recipeSection = useRef(null);
+  console.log(recipeSection);
   const [recipe, setRecipe] = useState("");
 
   const items = ingredients.map((element) => <li key={element}>{element}</li>);
@@ -26,6 +28,12 @@ export default function Hero() {
     const recipeText = await getRecipeFromGemini(ingredients);
     setRecipe(recipeText);
   }
+
+  useEffect(() => {
+    if (recipe !== "" && recipeSection.current != null) {
+      recipeSection.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [recipe]);
 
   return (
     <main className="flex justify-center items-center pt-20 flex-col gap-20 mr-6 ml-6  md:mr-35 md:ml-35">
@@ -66,7 +74,7 @@ export default function Hero() {
         <IngredientList ingredients={ingredients} getRecipe={fetchRecipe} />
       )}
 
-      {recipe && <GenRecipe recipe={recipe} />}
+      {recipe && <GenRecipe ref={recipeSection} recipe={recipe} />}
     </main>
   );
 }
